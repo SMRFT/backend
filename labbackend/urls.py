@@ -1,0 +1,33 @@
+#urls.py
+from django.urls import path
+from . import views
+urlpatterns = [
+    path('registration/', views.registration, name='registration'),
+    path('login/', views.login, name='login'),
+    path('patient/create/', views.create_patient, name='create_patient'),
+    path('latest-patient-id/', views.get_latest_patient_id, name='get_latest_patient_id'),
+    path('patient-get/', views.get_patient_details, name='sample_status'),
+    path('patients/', views.get_patients_by_date, name='get_patients_by_date'),
+    path('patient_report/', views.patient_report, name='patient_report'),
+    path('test_details/', views.get_test_details, name='get_test_details'),
+    path('compare_test_details/', views.compare_test_details, name='compare_test_details'),
+    path('get_patient_test_details/', views.get_patient_test_details, name='get_patient_test_details'),
+    path('test-value/save/', views.save_test_value, name='save_test_value'),
+    path('sample-collector/', views.sample_collector, name='create_sample_collector'),
+    path('refby/', views.refby, name='refby'),
+    path('clinical_name/', views.clinical_name, name='create_organisation'),
+    path('test-report/', views.get_test_report, name='get_test_report'),
+    path('test-values/', views.get_test_values, name='get_test_values'),
+    path('test-values/<str:patient_id>/<int:test_index>/approve/', views.approve_test_detail, name='approve_test_detail'),
+    path('test-values/<str:patient_id>/<int:test_index>/rerun/', views.rerun_test_detail, name='rerun_test_detail'),
+    path('update-test-detail/<str:patient_id>/', views.update_test_detail, name='update_test_detail'),
+    path("get_sample_collected/", views.get_sample_collected, name="get_sample_collected"),
+    path("update_sample_collected/<str:patient_id>/", views.update_sample_collected, name="update_sample_collected"),
+    path('sample_status/', views.sample_status, name='sample_status'),
+    path('update_sample_status/<str:patient_id>/', views.update_sample_status, name='update_sample_status'),
+    path('get_patient_test_status/', views.get_patient_test_status, name='get_patient_test_status'),
+    path('patient_overview/', views.patient_overview, name='patient_overview'),
+    path('patient_test_status/', views.patient_test_status, name='patient_test_status'),
+    path('all-patients/', views.get_all_patients, name='get_all_patients'),
+    path('update-credit/<str:patient_id>/', views.update_credit_amount, name='update_credit_amount'),
+]
