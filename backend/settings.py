@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-e3)%cko2j4=32fusjy^6$$t0-jhf!!7@40+^ut6nqxdzk6__h9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['3.109.122.211','lab.shinovadatabase.in']
 
 
 # Application definition
@@ -74,7 +74,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000","http://localhost:3001",'https://salemcosmeticclinic.netlify.app','https://shinovadatabase.in','https://api.shinovadatabase.in']
+    "http://localhost:3000","http://localhost:3001",'https://shinovadatabase.in','https://lab.shinova.in']
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
