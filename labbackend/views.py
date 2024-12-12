@@ -27,27 +27,26 @@ def registration(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
+
 from .models import Register
 @api_view(['POST'])
 def login(request):
     email = request.data.get('email')
     password = request.data.get('password')
-
     try:
         # Check if user exists
         user = Register.objects.get(email=email)
-
         # Directly compare the provided password with the stored password
         if password == user.password:
             # Successful login
             return Response({
-                "message": f"Login successful as {user.role}",
-                "role": user.role
+                "message": f"Login successful as {user.role,user.name}",
+                "role": user.role,
+                'name':user.name
             }, status=status.HTTP_200_OK)
         else:
             # Invalid password
             return Response({"error": "Invalid password"}, status=status.HTTP_401_UNAUTHORIZED)
-
     except Register.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     
