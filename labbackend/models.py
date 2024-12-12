@@ -33,6 +33,7 @@ class Patient(models.Model):
     totalAmount = models.CharField(max_length=100, blank=True)
     payment_method = models.JSONField(blank=True)
     credit_amount= models.CharField(max_length=50, blank=True)
+    registeredby= models.CharField(max_length=50, blank=True)
     def save(self, *args, **kwargs):
         # Automatically set fields based on B2B and home_collection
         if self.B2B:
