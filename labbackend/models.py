@@ -161,20 +161,7 @@ class HospitalLab(models.Model):
         return self.hospitalName
 
 
-from django.db import models
-class HospitalLab(models.Model):
-    TYPE_CHOICES = [
-        ('StandAlone', 'StandAlone'),
-        ('Lab', 'Lab'),
-    ]
-    hospitalName = models.CharField(max_length=255)
-    type = models.CharField(max_length=50, choices=TYPE_CHOICES, default='StandAlone')
-    contactPerson = models.CharField(max_length=255)
-    contactNumber = models.CharField(max_length=20)
-    emailId = models.EmailField()
-    salesPersonName = models.CharField(max_length=255)
-    def __str__(self):
-        return self.hospitalName
+
 
 
 class LogisticData(models.Model):
