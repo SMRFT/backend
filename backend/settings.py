@@ -9,6 +9,13 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
+import os
+from pathlib import Path
+import certifi
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 from pathlib import Path
 import certifi
@@ -25,7 +32,7 @@ SECRET_KEY = 'django-insecure-e3)%cko2j4=32fusjy^6$$t0-jhf!!7@40+^ut6nqxdzk6__h9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 
 # Application definition
@@ -84,6 +91,22 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 import certifi
 
+import os
+# import certifi
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'djongo',
+#         'NAME': os.getenv("DB_NAME"),
+#         'ENFORCE_SCHEMA': False,
+#         'CLIENT': {
+#             'host': os.getenv("DB_HOST"),
+#             'tls': False,  # ✅ Disable TLS if not required
+#         }
+#     }
+# }
+import certifi
+
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
@@ -97,8 +120,6 @@ DATABASES = {
         }
     }
 }
-
-
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
@@ -147,6 +168,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'resultssmrft@gmail.com'
-EMAIL_HOST_PASSWORD = 'nfkk krtt htoq asge'
-DEFAULT_FROM_EMAIL = 'resultssmrft@gmail.com'
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.getenv("EMAIL_HOST_USER")
