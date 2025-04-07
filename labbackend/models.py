@@ -6,11 +6,9 @@ class Register(models.Model):
     role = models.CharField(max_length=500)
     password = models.CharField(max_length=500)
     confirmPassword = models.CharField(max_length=500)
-
-    
 #new registration
 class Patient(models.Model):
-    patient_id = models.CharField(max_length=10,primary_key=True)
+    patient_id = models.CharField(max_length=10)
     patientname = models.CharField(max_length=100)
     phone = models.CharField(max_length=15, blank=True)
     gender = models.CharField(max_length=10)
@@ -19,7 +17,7 @@ class Patient(models.Model):
     age = models.IntegerField()
     age_type = models.CharField(max_length=10, blank=True)  # Adjusted field name for consistency
     sample_collector = models.CharField(max_length=100, blank=True)
-    sales_representative = models.CharField(max_length=100, blank=True)
+    salesMapping = models.CharField(max_length=100, blank=True)
     date = models.DateTimeField()
     discount= models.CharField(max_length=100, blank=True)
     lab_id = models.CharField(max_length=50, blank=True)
@@ -36,6 +34,7 @@ class Patient(models.Model):
     credit_amount = models.CharField(max_length=100, blank=True)
     def save(self, *args, **kwargs):
         # Generate the billno if not already set
+        self.credit_amount = self.credit_amount if self.credit_amount else "0"
         if not self.bill_no:
             today = datetime.now().strftime('%Y%m%d')  # Current year, month, date
             last_bill = Patient.objects.filter(bill_no__startswith=today).order_by('-bill_no').first()
@@ -52,21 +51,44 @@ class Patient(models.Model):
     
 
 class ClinicalName(models.Model):
+    # Using referrerCode as primary key instead of id
+    referrerCode = models.CharField(max_length=10, primary_key=True)
     clinicalname = models.CharField(max_length=255)
-    test_name = models.JSONField(default=list)
-    referrerCode = models.CharField(max_length=100, blank=True, null=True)
-    location = models.CharField(max_length=255, blank=True, null=True)
-    type = models.CharField(max_length=100, blank=True, null=True)
-    salesMapping = models.CharField(max_length=255, blank=True, null=True)
-    email = models.CharField(max_length=255, blank=True, null=True)
-    phone = models.CharField(max_length=255, blank=True, null=True)
-    def save(self, *args, **kwargs):
-        if not self.referrerCode:
-            # Generate or assign referrerCode if not provided
-            self.referrerCode = "SD0000"  # Example: use the logic from get_last_referrer_code
-        super().save(*args, **kwargs)
+    type = models.CharField(max_length=50, blank=True, null=True)
+    salesMapping = models.CharField(max_length=100, blank=True, null=True)
+    reportDelivery = models.CharField(max_length=100, blank=True, null=True)
+    report = models.CharField(max_length=50, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    alternateNumber = models.CharField(max_length=20, blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
+    area = models.CharField(max_length=100, blank=True, null=True)
+    state = models.CharField(max_length=100, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    pincode = models.CharField(max_length=10, blank=True, null=True)
+    b2bType = models.CharField(max_length=50, blank=True, null=True)
+    creditType = models.CharField(max_length=50, blank=True, null=True)
+    mou_file_id = models.CharField(max_length=255, blank=True, null=True)
+    creditLimit = models.CharField(max_length=10, blank=True, null=True)
+    invoicePeriod = models.CharField(max_length=50, blank=True, null=True)
+    # Approval fields
+    created_at = models.DateTimeField(auto_now_add=True)
+    first_approved = models.BooleanField(default=False)
+    final_approved = models.BooleanField(default=False)
+    first_approved_timestamp = models.DateTimeField(null=True, blank=True)
+    final_approved_timestamp = models.DateTimeField(null=True, blank=True)
+    APPROVAL_STAGES = (
+        ('PENDING_APPROVAL', 'Pending Approval'),
+        ('PENDING_FINAL', 'Pending Final Approval'),
+        ('APPROVED', 'Fully Approved'),
+    )
+    status = models.CharField(
+        max_length=50,
+        choices=APPROVAL_STAGES,
+        default='PENDING_APPROVAL'
+    )
     def __str__(self):
-        return f"{self.clinicalname}"
+        return f"{self.clinicalname} ({self.referrerCode})"
 
     
 class RefBy(models.Model):
@@ -87,17 +109,16 @@ class SampleCollector(models.Model):
     def __str__(self):
         return f"{self.name}"
     
-    
 from bson import ObjectId  # Import ObjectId from bson
 class TestValue(models.Model):
-    _id = models.CharField(max_length=50, primary_key=True) 
+    _id = models.CharField(max_length=50, primary_key=True)
     patient_id = models.CharField(max_length=10)
     patientname = models.CharField(max_length=100)
     age = models.IntegerField()
     date = models.DateField()
+    barcode= models.CharField(max_length=50)
     testdetails = models.JSONField()  # Store all test details in JSON format
     # approved_by = models.CharField(max_length=200, null=True, blank=True)
-    
     def save(self, *args, **kwargs):
         if not self._id:
             self._id = str(ObjectId())  # Convert ObjectId to string
@@ -108,6 +129,7 @@ class SampleStatus(models.Model):
     patient_id = models.CharField(max_length=100)
     patientname = models.CharField(max_length=100)
     barcode= models.CharField(max_length=50)
+    age = models.IntegerField()
     segment = models.CharField(max_length=50, blank=True)
     date = models.DateTimeField(null=True, blank=True)  # Use DateTimeField to store both date and time
     testdetails = models.JSONField(default=list)  # Assuming you're using Django 3.1+ for JSONField
@@ -123,7 +145,7 @@ class BarcodeTestDetails(models.Model):
     age = models.CharField(max_length=255)
     gender = models.CharField(max_length=50)
     date = models.DateField()
-    bill_no= models.CharField(max_length=50)
+    bill_no= models.CharField(max_length=50, primary_key=True,unique=True)
     barcode= models.CharField(max_length=50)
     tests = models.JSONField()  # Store tests as a list of dictionaries
     def __str__(self):
@@ -133,20 +155,21 @@ class BarcodeTestDetails(models.Model):
 class SalesVisitLog(models.Model):
     date = models.DateField()
     time = models.CharField(max_length=255)
-    referrerCode = models.CharField(max_length=255,blank=True)
     clinicalname = models.CharField(max_length=255,blank=True)
-    salesPersonName = models.CharField(max_length=100,blank=True)
+    salesMapping = models.CharField(max_length=100,blank=True)
     personMet = models.CharField(max_length=100,blank=True)
     designation = models.CharField(max_length=100,blank=True)
     location = models.CharField(max_length=100,blank=True)
     phoneNumber = models.CharField(max_length=15,blank=True)
     noOfVisits=  models.CharField(max_length=15,blank=True)
-    comments = models.CharField(max_length=15,blank=True)
+    comments = models.CharField(max_length=150,blank=True)
     type = models.CharField(max_length=100,blank=True)
     
+
+
+
 from django.db import models
 class HospitalLab(models.Model):
-    date = models.DateField()
     TYPE_CHOICES = [
         ('StandAlone', 'StandAlone'),
         ('Lab', 'Lab'),
@@ -156,34 +179,34 @@ class HospitalLab(models.Model):
     contactPerson = models.CharField(max_length=255)
     contactNumber = models.CharField(max_length=20)
     emailId = models.EmailField()
-    salesPersonName = models.CharField(max_length=255)
+    salesMapping = models.CharField(max_length=255)
     def __str__(self):
         return self.hospitalName
 
 
-
-
-
 class LogisticData(models.Model):
     date = models.DateField()
-    time = models.CharField(max_length=255)
+    sampleordertime = models.CharField(max_length=255)
     labName= models.CharField(max_length=255)
-    salesperson = models.CharField(max_length=255, blank=True, null=True)
+    salesMapping = models.CharField(max_length=255, blank=True, null=True)
     sampleCollector = models.CharField(max_length=255)
     def __str__(self):
         return f"{self.labName} - {self.date}"
     
 
 class LogisticTask(models.Model):
-    samplecollectorname = models.CharField(max_length=100)
+    sampleCollector = models.CharField(max_length=255)
     date = models.DateField()
-    time = models.CharField(max_length=255)
+    sampleordertime = models.CharField(max_length=255)
+    sampleacceptedtime = models.CharField(max_length=255)
     lab_name = models.CharField(max_length=255)
-    salesperson = models.CharField(max_length=255)
-    task = models.CharField(max_length=50, choices=[("Accepted", "Accepted"), ("Not Accepted", "Not Accepted")])
+    salesMapping = models.CharField(max_length=255)
+    task = models.CharField(max_length=50, choices=[("Accepted", "Accepted"), ("Not Accepted", "Not Accepted")], blank=True, null=True)
+    status = models.CharField(max_length=255, blank=True, null=True)
+    samplepickeduptime = models.CharField(max_length=255, blank=True, null=True)
     remarks = models.TextField(blank=True, null=True)
     def __str__(self):
-        return f"{self.date} - {self.lab_name} - {self.salesperson}"
+        return f"{self.date} - {self.lab_name} - {self.salesMapping}"
 
 
 
