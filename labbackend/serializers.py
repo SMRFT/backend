@@ -8,11 +8,25 @@ class ObjectIdField(serializers.Field):
         return ObjectId(data)
 
 
-from .models import Register   
+from rest_framework import serializers
+from .models import Register
+
 class RegisterSerializer(serializers.ModelSerializer):
+    confirmPassword = serializers.CharField(write_only=True)
+
     class Meta:
         model = Register
-        fields = '__all__'
+        fields = ['name', 'role', 'password', 'confirmPassword']
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def validate(self, data):
+        if data.get('password') != data.get('confirmPassword'):
+            raise serializers.ValidationError({"confirmPassword": "Passwords do not match."})
+        return data
+
+    def create(self, validated_data):
+        validated_data.pop('confirmPassword')  # Remove confirmPassword before saving
+        return Register.objects.create(**validated_data)
 
 
 from .models import Patient
@@ -98,3 +112,26 @@ class LogisticTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = LogisticTask
         fields = '__all__'
+
+
+from django.core.validators import FileExtensionValidator
+from .models import ClinicalName
+class ClinicalNameSerializer(serializers.ModelSerializer):
+    mouCopy = serializers.FileField(
+        required=False,
+        validators=[FileExtensionValidator(['pdf', 'doc', 'docx', 'jpg', 'png', 'csv'])],
+        write_only=True
+    )
+    class Meta:
+        model = ClinicalName
+        fields = '__all__'
+        extra_kwargs = {
+            'mou_file_id': {'read_only': True},
+            'first_approved': {'read_only': True},
+            'final_approved': {'read_only': True},
+            'first_approved_timestamp': {'read_only': True},
+            'final_approved_timestamp': {'read_only': True},
+            'status': {'read_only': True}
+        }
+
+
