@@ -32,7 +32,7 @@ SECRET_KEY = 'django-insecure-e3)%cko2j4=32fusjy^6$$t0-jhf!!7@40+^ut6nqxdzk6__h9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,node221864-env-0990718.in1.cloudlets.co.in").split(",")
 
 
 # Application definition
